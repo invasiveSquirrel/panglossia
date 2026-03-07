@@ -194,6 +194,13 @@ async def speak(request: SpeakRequest):
     text_to_speak = re.sub(r"^\d+\.\s*", "", request.text.split("[English]")[0].split("HELPFUL ADVICE")[0].split("VOCABULARY")[0].strip())
     if not text_to_speak: return {"status": "ok"}
 
+    if request.language == "scottish_gaelic":
+        try:
+            subprocess.run(["espeak-ng", "-v", "gd", "-s", "150", text_to_speak], check=False)
+            return {"status": "ok"}
+        except Exception as e:
+            print(f"Gaelic Error: {e}")
+
     if texttospeech and os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
         try:
             client = texttospeech.TextToSpeechClient()
@@ -204,7 +211,7 @@ async def speak(request: SpeakRequest):
                 "portuguese": ("pt-BR", "pt-BR-Chirp3-HD-Dione"),
                 "spanish": ("es-US", "es-US-Chirp3-HD-Callirrhoe"),
                 "dutch": ("nl-NL", "nl-NL-Chirp3-HD-Despina"),
-                "scottish_gaelic": ("en-GB", "en-GB-Wavenet-B")
+                "scottish_gaelic": ("en-GB", "en-GB-Wavenet-D")
             }
             l_code, v_name = gtts_voice_map.get(request.language, ("en-US", "en-US-Journey-F"))
             response = client.synthesize_speech(

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Send, Volume2, Sparkles, Settings, Trash2 } from 'lucide-react';
 import './App.css';
 
-type Language = 'swedish' | 'german' | 'finnish' | 'portuguese' | 'spanish' | 'dutch';
+type Language = 'swedish' | 'german' | 'finnish' | 'portuguese' | 'spanish' | 'dutch' | 'scottish_gaelic';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,7 +15,8 @@ const LANG_CODES: Record<Language, string> = {
   finnish: 'fi-FI',
   portuguese: 'pt-BR',
   spanish: 'es-MX',
-  dutch: 'nl-NL'
+  dutch: 'nl-NL',
+  scottish_gaelic: 'en-GB'
 };
 
 const LANG_NAMES: Record<Language, string> = {
@@ -24,7 +25,8 @@ const LANG_NAMES: Record<Language, string> = {
   finnish: 'Suomi',
   portuguese: 'Português',
   spanish: 'Español',
-  dutch: 'Nederlands'
+  dutch: 'Nederlands',
+  scottish_gaelic: 'Gàidhlig'
 };
 
 const WELCOME_TEXT: Record<Language, string> = {
@@ -33,7 +35,8 @@ const WELCOME_TEXT: Record<Language, string> = {
   finnish: 'Harjoitellaan suomea ja ruotsia!',
   portuguese: 'Vamos praticar português!',
   spanish: '¡Practiquemos español!',
-  dutch: 'Laten we Nederlands oefenen!'
+  dutch: 'Laten we Nederlands oefenen!',
+  scottish_gaelic: 'Bribha sinn Gàidhlig!'
 };
 
 const INSTRUCTION_TEXT: Record<Language, string> = {
@@ -42,7 +45,8 @@ const INSTRUCTION_TEXT: Record<Language, string> = {
   finnish: 'Napsauta mikrofonia puhuaksesi tai kirjoita alle.',
   portuguese: 'Clique no microfone para falar ou escreva abaixo.',
   spanish: 'Haz clic en el micrófono para hablar o escribe abajo.',
-  dutch: 'Klik op de microfoon om te praten of schrijf hieronder.'
+  dutch: 'Klik op de microfoon om te praten of schrijf hieronder.',
+  scottish_gaelic: 'Cliog air a’ mhiocrofon airson bruidhinn no sgrìobh gu h-ìosal.'
 };
 
 const PLACEHOLDER_TEXT: Record<Language, string> = {
@@ -51,10 +55,11 @@ const PLACEHOLDER_TEXT: Record<Language, string> = {
   finnish: 'Puhu minulle suomeksi tai ruotsiksi...',
   portuguese: 'Fale comigo em português...',
   spanish: 'Hable conmigo en español...',
-  dutch: 'Praat met me in het Nederlands...'
+  dutch: 'Praat met me in het Nederlands...',
+  scottish_gaelic: 'Bruidhinn rium ann an Gàidhlig...'
 };
 
-const LANGUAGES: Language[] = ['swedish', 'german', 'finnish', 'portuguese', 'spanish', 'dutch'];
+const LANGUAGES: Language[] = ['swedish', 'german', 'finnish', 'portuguese', 'spanish', 'dutch', 'scottish_gaelic'];
 
 function App() {
   const [language, setLanguage] = useState<Language>(() => {
@@ -244,6 +249,7 @@ function App() {
         );
       });
   };
+
   return (
     <div className="app-container">
       <header>
