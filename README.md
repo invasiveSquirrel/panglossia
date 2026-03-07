@@ -4,10 +4,10 @@ Panglossia is an AI-powered conversational language learning tool. It allows you
 
 ## Key Features
 - **Conversational Learning**: Chat with an AI tutor in your target language.
-- **Dynamic Vocabulary Extraction**: Important words from your chat are saved into Markdown files.
+- **Dynamic Vocabulary Extraction**: Important words from your chat are saved directly to the shared Wordhord SQLite database.
 - **Grammar Feedback**: Real-time corrections and grammatical explanations.
-- **Multi-language Support**: Swedish, German, Finnish, Spanish, Portuguese, and Dutch.
-- **Voice Integration**: High-quality TTS and STT via Google Cloud or local Piper fallback.
+- **Multi-language Support**: Swedish, German, Finnish, Spanish, Portuguese, Dutch, and Scottish Gaelic.
+- **Voice Integration**: High-quality TTS and STT via Google Cloud or local espeak-ng/Piper fallback.
 
 ---
 
@@ -30,6 +30,7 @@ Panglossia requires [Ollama](https://ollama.com/) to be running locally as the b
 ### Prerequisites
 - **Node.js** (v18 or higher)
 - **Python** (v3.10 or higher)
+- **espeak-ng**: For Scottish Gaelic and IPA support.
 
 ### 1. Clone the repository
 ```bash
@@ -68,7 +69,9 @@ cd panglossia
     ```
 
 #### **Linux**
-Follow the macOS steps above or use the provided `./start.sh`.
+```bash
+./start.sh
+```
 
 ---
 
@@ -102,23 +105,23 @@ Open two terminals:
 
 ## 📖 How to Use Panglossia
 
-1.  **Select Practice Language**: Choose the language you want to speak.
-2.  **Chat**: Type in the chat box to converse with the AI tutor.
-3.  **Learn**: Receive grammar corrections and watch as new words are automatically extracted into Markdown files.
-4.  **Sync**: Use your extracted vocabulary in **Wordhord** for flashcard training.
+1.  **Select Practice Language**: Choose the language you want to speak (including Scottish Gaelic).
+2.  **Chat**: Type in the chat box to converse with the AI tutor (Morag for Gaelic, Katja for German, etc.).
+3.  **Learn**: Receive grammar corrections and watch as new words are automatically extracted.
+4.  **Sync**: Your vocabulary is saved to `~/wordhord.db`, ready for use in **Wordhord**.
 
 ---
 
 ## ⚙️ Customizing the Tutor (Prompts)
 
-You can customize your tutor's personality by editing the text files in `backend/prompts/` (e.g., `swedish.txt`).
+You can customize your tutor's personality by editing the text files in `backend/prompts/` (e.g., `scottish_gaelic.txt`).
 - **Change Level**: Edit the prompt to specify A1, B1, or B2 levels.
 - **Change Personality**: Tell the AI to be a strict teacher or a friendly travel companion.
 
 ---
 
 ## Configuration
-- **Google Cloud**: Place your `google-credentials.json` in the root and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to enable high-quality voice features.
+- **Google Cloud**: Place your `google-credentials.json` in the root and set `GOOGLE_APPLICATION_CREDENTIALS` to enable high-quality voice features.
 
 ## License
 MIT
