@@ -255,7 +255,7 @@ function App() {
       <header>
         <div className="logo">
           <h1>
-            Polyglossia&nbsp;&nbsp;&nbsp;
+            Panglossia&nbsp;&nbsp;&nbsp;
             <span style={{ color: '#eed49f', fontFamily: '"Noto Serif Hebrew", serif', fontWeight: 900 }}>
               א
             </span>

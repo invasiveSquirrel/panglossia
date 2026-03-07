@@ -1,6 +1,6 @@
-# Polyglossia
+# Panglossia
 
-Polyglossia is an AI-powered conversational language learning tool. It allows you to engage in natural dialogues with an AI tutor while receiving real-time linguistic support, grammar corrections, and vocabulary expansion.
+Panglossia is an AI-powered conversational language learning tool. It allows you to engage in natural dialogues with an AI tutor while receiving real-time linguistic support, grammar corrections, and vocabulary expansion.
 
 ## Key Features
 - **Conversational Learning**: Chat with an AI tutor in your target language.
@@ -13,7 +13,7 @@ Polyglossia is an AI-powered conversational language learning tool. It allows yo
 
 ## 🚀 Setting Up Ollama (AI Engine)
 
-Polyglossia requires [Ollama](https://ollama.com/) to be running locally as the brain of your tutor.
+Panglossia requires [Ollama](https://ollama.com/) to be running locally as the brain of your tutor.
 
 1.  **Download**: Visit [ollama.com](https://ollama.com/download) and download for Windows, macOS, or Linux.
 2.  **Install**: Run the installer and ensure Ollama is active.
@@ -21,7 +21,7 @@ Polyglossia requires [Ollama](https://ollama.com/) to be running locally as the 
     ```bash
     ollama run gemma2:9b
     ```
-4.  **Keep it Running**: Ollama must be active in the background while you chat in Polyglossia.
+4.  **Keep it Running**: Ollama must be active in the background while you chat in Panglossia.
 
 ---
 
@@ -33,8 +33,8 @@ Polyglossia requires [Ollama](https://ollama.com/) to be running locally as the 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/invasiveSquirrel/polyglossia.git
-cd polyglossia
+git clone https://github.com/invasiveSquirrel/panglossia.git
+cd panglossia
 ```
 
 ### 2. OS-Specific Setup
@@ -100,7 +100,7 @@ Open two terminals:
 
 ---
 
-## 📖 How to Use Polyglossia
+## 📖 How to Use Panglossia
 
 1.  **Select Practice Language**: Choose the language you want to speak.
 2.  **Chat**: Type in the chat box to converse with the AI tutor.

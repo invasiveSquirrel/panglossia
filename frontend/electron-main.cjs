@@ -1,7 +1,7 @@
 const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 
-app.setName('Polyglossia');
+app.setName('Panglossia');
 
 // Enable speech recognition API before app is ready
 app.commandLine.appendSwitch('enable-speech-dispatcher');
@@ -11,7 +11,7 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 1100,
     height: 900,
-    title: 'Polyglossia',
+    title: 'Panglossia',
     icon: path.join(__dirname, '../icon.png'),
     backgroundColor: '#1e1e2e', // Catppuccin Base
     autoHideMenuBar: true, // Hides the Alt-menu by default
