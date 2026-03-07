@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+langchain-ollama
+sqlalchemy
+google-cloud-texttospeech
+google-cloud-speech
+python-multipart

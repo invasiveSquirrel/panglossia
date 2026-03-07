@@ -2,8 +2,41 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain_ollama import OllamaLLM
+from sqlalchemy import create_engine, Column, Integer, String, UniqueConstraint
+from sqlalchemy.orm import declarative_base, sessionmaker
 import os
 import subprocess
+import re
+import json
+
+# Database Setup (Sharing Wordhord's DB)
+DB_PATH = "/home/chris/wordhord.db"
+engine = create_engine(f"sqlite:///{DB_PATH}")
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class CardModel(Base):
+    __tablename__ = "cards"
+    id = Column(Integer, primary_key=True, index=True)
+    language = Column(String)
+    term = Column(String)
+    translation = Column(String)
+    ipa = Column(String)
+    gender = Column(String)
+    part_of_speech = Column(String)
+    tone = Column(String)
+    prefix = Column(String)
+    preposition = Column(String)
+    case = Column(String)
+    conjugations = Column(String)
+    example = Column(String)
+    example_translation = Column(String)
+    passed = Column(Integer, default=0)
+    failed = Column(Integer, default=0)
+    __table_args__ = (UniqueConstraint('language', 'term', name='_language_term_uc'),)
+
+Base.metadata.create_all(bind=engine)
+
 try:
     from google.cloud import texttospeech
     from google.cloud import speech
@@ -36,17 +69,7 @@ def get_system_prompt(language: str) -> str:
     if os.path.exists(prompt_file):
         with open(prompt_file, "r") as f:
             return f.read().strip()
-    
-    # Fallback to hardcoded prompts if file missing
-    prompts = {
-        "swedish": "You are Elina, a therapist from Stockholm...",
-        "german": "You are Katja, a therapist from Berlin...",
-        "finnish": "You are Aino, a bilingual therapist from Helsinki and Porvoo. You practice in both Finnish and Swedish. Practice both with the user, as they are both official languages of Finland.",
-        "portuguese": "You are Luciana, a warm and energetic therapist from Rio de Janeiro, Brazil. You practice Brazilian Portuguese with the user.",
-        "spanish": "You are Ximena, a therapist from Mexico City...",
-        "dutch": "You are Anika, a therapist from Amsterdam..."
-    }
-    return prompts.get(language, "You are a helpful language tutor.")
+    return "You are a helpful language tutor."
 
 class ChatRequest(BaseModel):
     message: str
@@ -57,18 +80,64 @@ class SpeakRequest(BaseModel):
     text: str
     language: str
 
+def extract_field(section, field_name):
+    pattern = fr'{field_name}:\s*(.*?)(?:\n\s*-|\n\s*Example:|\n\s*##|$)'
+    match = re.search(pattern, section, re.DOTALL | re.IGNORECASE)
+    return match.group(1).strip() if match else ""
+
+def parse_and_save_vocab(language, response_text):
+    # Regex to find cards: - **term** (translation)
+    pattern = r'- \*\*([^*]+)\*\*\s*\(([^)]+)\)'
+    matches = list(re.finditer(pattern, response_text))
+    
+    if not matches:
+        return
+
+    db = SessionLocal()
+    for i, match in enumerate(matches):
+        term = match.group(1).strip()
+        translation = match.group(2).strip()
+        
+        start_pos = match.end()
+        end_pos = matches[i+1].start() if i + 1 < len(matches) else len(response_text)
+        section = response_text[start_pos:end_pos]
+        
+        card = CardModel(
+            language=language,
+            term=term,
+            translation=translation,
+            ipa=extract_field(section, 'IPA'),
+            gender=extract_field(section, 'Gender'),
+            part_of_speech=extract_field(section, 'Part of Speech'),
+            tone=extract_field(section, 'Tone'),
+            prefix=extract_field(section, 'Prefix'),
+            preposition=extract_field(section, 'Preposition'),
+            case=extract_field(section, 'Case'),
+            conjugations=extract_field(section, 'Conjugations'),
+        )
+        
+        ex_match = re.search(r'Example:\s*"([^"]+)"\s*\(([^)]+)\)', section)
+        if ex_match:
+            card.example = ex_match.group(1)
+            card.example_translation = ex_match.group(2)
+        
+        try:
+            db.merge(card)
+            db.commit()
+        except Exception as e:
+            print(f"Error saving vocab {term}: {e}")
+            db.rollback()
+    db.close()
+
 @app.post("/chat")
 async def chat(request: ChatRequest):
     system_prompt = get_system_prompt(request.language)
-    
-    # Gemma 2 works best with clear instruction boundaries
     prompt_text = f"INSTRUCTION: {system_prompt}\n\n"
     
     for msg in request.history:
         role = "USER" if msg["role"] == "user" else "ASSISTANT"
         prompt_text += f"{role}: {msg['content']}\n"
     
-    # Add a strict layout reminder at the end of the user's current message
     extra_instructions = ""
     if request.language == "swedish":
         extra_instructions = " For Swedish vocabulary, always mention the tone (Accent 1 or 2)."
@@ -76,7 +145,6 @@ async def chat(request: ChatRequest):
         extra_instructions = " For German verbs with a prefix, always state if they are 'Separable' or 'Inseparable' in a 'Prefix:' field."
     
     verb_instructions = " ALL verbs must include any associated prepositions in a 'Preposition:' field and the grammatical case they govern in a 'Case:' field."
-    
     format_instruction = "\nVOCABULARY format:\n- **Word** (Translation)\n  - IPA: [ipa]\n  - Part of Speech: [pos]\n  - Gender: [if applicable]\n  - Tone: [Swedish only]\n  - Prefix: [German verbs only]\n  - Preposition: [verbs only]\n  - Case: [verbs only]\n  - Conjugations: [forms]\n  Example: \"Sentence\" (Translation)"
 
     if request.language == "finnish":
@@ -84,143 +152,84 @@ async def chat(request: ChatRequest):
     else:
         target_lang = request.language.capitalize()
         layout_reminder = f"\n\n(REMINDER: Follow the requested LAYOUT exactly: {target_lang} paragraph(s), [English] response, HELPFUL ADVICE, and VOCABULARY & EXAMPLES section. All examples MUST be in {target_lang}.{extra_instructions}{verb_instructions}{format_instruction})"
+    
     prompt_text += f"USER: {request.message}{layout_reminder}\nASSISTANT:"
     
     try:
-        # Request the model and explicitly set stop tokens if supported, 
-        # otherwise we handle the truncation manually below.
         response = llm.invoke(prompt_text, stop=["USER:", "User:", "System:"])
         
-        # Manual safety check: Truncate if the model hallucinates a User section anyway
-        if "USER:" in response:
-            response = response.split("USER:")[0].strip()
-        if "User:" in response:
-            response = response.split("User:")[0].strip()
+        if "USER:" in response: response = response.split("USER:")[0].strip()
+        if "User:" in response: response = response.split("User:")[0].strip()
             
-        # Extract Vocabulary and Examples and save to a markdown file
-        import re
+        # Extract and save to SQL database
         match = re.search(r'(?i)(VOCABULARY|EXPRESSIONS)', response)
         if match:
-            vocab_section = response[match.start():].strip()
-            vocab_file = os.path.join(os.path.dirname(BASE_DIR), f"{request.language}_vocab.md")
-            with open(vocab_file, "a", encoding="utf-8") as vf:
-                vf.write(f"\n\n---\n\n{vocab_section}\n")
+            parse_and_save_vocab(request.language, response[match.start():])
             
         return {"response": response}
     except Exception as e:
-        print(f"DEBUG: Chat error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/transcribe")
 async def transcribe(audio: UploadFile = File(...), language: str = Form(...)):
     if not speech or not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
         raise HTTPException(status_code=501, detail="Speech-to-Text not configured")
-
     try:
         content = await audio.read()
         client = speech.SpeechClient()
-        
         lang_codes = {"swedish": "sv-SE", "german": "de-DE", "finnish": "fi-FI", "portuguese": "pt-BR", "spanish": "es-US", "dutch": "nl-NL"}
-        target_lang = lang_codes.get(language, "en-US")
-        
-        # Support alternative languages for bilingual tutors (e.g., Finnish tutor also speaks Swedish)
-        alt_langs = []
-        if language == "finnish":
-            alt_langs = ["sv-FI", "sv-SE"]
-
-        audio_config = speech.RecognitionAudio(content=content)
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
             sample_rate_hertz=48000,
-            language_code=target_lang,
-            alternative_language_codes=alt_langs,
+            language_code=lang_codes.get(language, "en-US"),
+            alternative_language_codes=["sv-FI", "sv-SE"] if language == "finnish" else [],
         )
-
-        response = client.recognize(config=config, audio=audio_config)
-        
-        transcript = ""
-        for result in response.results:
-            transcript += result.alternatives[0].transcript + " "
-            
-        return {"transcript": transcript.strip()}
+        response = client.recognize(config=config, audio=speech.RecognitionAudio(content=content))
+        return {"transcript": " ".join([r.alternatives[0].transcript for r in response.results]).strip()}
     except Exception as e:
-        print(f"DEBUG: Transcribe error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/speak")
 async def speak(request: SpeakRequest):
-    # Only speak text BEFORE any header section or the [English] marker
-    # Also strip out list markers like "1. " at the beginning of the text
-    import re
-    text_to_speak = request.text.split("[English]")[0].split("HELPFUL ADVICE")[0].split("VOCABULARY")[0].strip()
-    text_to_speak = re.sub(r"^\d+\.\s*", "", text_to_speak)
-    
-    if not text_to_speak:
-        return {"status": "ok"}
+    text_to_speak = re.sub(r"^\d+\.\s*", "", request.text.split("[English]")[0].split("HELPFUL ADVICE")[0].split("VOCABULARY")[0].strip())
+    if not text_to_speak: return {"status": "ok"}
 
     if texttospeech and os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
         try:
-            import json
-            with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], 'r') as f:
-                creds = json.load(f)
-                if "YOUR_PROJECT_ID" in str(creds.get("project_id", "")):
-                    raise ValueError("Placeholder credentials detected")
-
             client = texttospeech.TextToSpeechClient()
-            synthesis_input = texttospeech.SynthesisInput(text=text_to_speak)
-            
             gtts_voice_map = {
-                "swedish": texttospeech.VoiceSelectionParams(language_code="sv-SE", name="sv-SE-Chirp3-HD-Laomedeia"),
-                "german": texttospeech.VoiceSelectionParams(language_code="de-DE", name="de-DE-Chirp3-HD-Leda"),
-                "finnish": texttospeech.VoiceSelectionParams(language_code="fi-FI", name="fi-FI-Chirp3-HD-Despina"),
-                "portuguese": texttospeech.VoiceSelectionParams(language_code="pt-BR", name="pt-BR-Chirp3-HD-Dione"),
-                "spanish": texttospeech.VoiceSelectionParams(language_code="es-US", name="es-US-Chirp3-HD-Callirrhoe"),
-                "dutch": texttospeech.VoiceSelectionParams(language_code="nl-NL", name="nl-NL-Chirp3-HD-Despina")
+                "swedish": ("sv-SE", "sv-SE-Chirp3-HD-Laomedeia"),
+                "german": ("de-DE", "de-DE-Chirp3-HD-Leda"),
+                "finnish": ("fi-FI", "fi-FI-Chirp3-HD-Despina"),
+                "portuguese": ("pt-BR", "pt-BR-Chirp3-HD-Dione"),
+                "spanish": ("es-US", "es-US-Chirp3-HD-Callirrhoe"),
+                "dutch": ("nl-NL", "nl-NL-Chirp3-HD-Despina"),
+                "scottish_gaelic": ("en-GB", "en-GB-Wavenet-B")
             }
-            
-            voice = gtts_voice_map.get(request.language, texttospeech.VoiceSelectionParams(language_code="en-US", name="en-US-Journey-F"))
-            audio_config = texttospeech.AudioConfig(
-                audio_encoding=texttospeech.AudioEncoding.LINEAR16,
-                pitch=0.0,
-                speaking_rate=0.95
+            l_code, v_name = gtts_voice_map.get(request.language, ("en-US", "en-US-Journey-F"))
+            response = client.synthesize_speech(
+                input=texttospeech.SynthesisInput(text=text_to_speak),
+                voice=texttospeech.VoiceSelectionParams(language_code=l_code, name=v_name),
+                audio_config=texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.LINEAR16, speaking_rate=0.95)
             )
-            
-            response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
-            
-            gtts_wav = "/tmp/polyglossia_gtts.wav"
-            with open(gtts_wav, "wb") as out:
-                out.write(response.audio_content)
-                
-            subprocess.run(["aplay", gtts_wav], check=True)
+            with open("/tmp/polyglossia_gtts.wav", "wb") as out: out.write(response.audio_content)
+            subprocess.run(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", "/tmp/polyglossia_gtts.wav"], check=False)
             return {"status": "ok"}
-        except Exception as e:
-            print(f"DEBUG: Google TTS error: {e}, falling back to local TTS...")
+        except Exception: pass
 
-    voice_map = {
-        "swedish": os.path.join(VOICE_DIR, "sv_female.onnx"),
-        "finnish": os.path.join(VOICE_DIR, "fi_female.onnx"),
-        "spanish": os.path.join(VOICE_DIR, "es_mx_ximena.onnx")
-    }
-    
-    if request.language in voice_map and os.path.exists(voice_map[request.language]):
-        voice_path = voice_map[request.language]
-        temp_wav = "/tmp/polyglossia_raw.wav"
-        env = os.environ.copy()
-        env["LD_LIBRARY_PATH"] = f"{PIPER_LIB}:{env.get('LD_LIBRARY_PATH', '')}"
-        
-        try:
-            cmd = [PIPER_BIN, "--model", voice_path, "--output_file", temp_wav, "--length_scale", "1.1"]
-            process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env, cwd=BASE_DIR)
-            process.communicate(input=text_to_speak)
-            
-            if process.returncode == 0:
-                subprocess.run(["aplay", temp_wav], check=True)
-                return {"status": "ok"}
-        except Exception as e:
-            print(f"DEBUG: Piper/SoX error: {e}")
+    voice_map = {"swedish": "sv_female.onnx", "finnish": "fi_female.onnx", "spanish": "es_mx_ximena.onnx"}
+    if request.language in voice_map:
+        v_path = os.path.join(VOICE_DIR, voice_map[request.language])
+        if os.path.exists(v_path):
+            temp_wav = "/tmp/polyglossia_local.wav"
+            env = os.environ.copy()
+            env["LD_LIBRARY_PATH"] = f"{PIPER_LIB}:{env.get('LD_LIBRARY_PATH', '')}"
+            cmd = [PIPER_BIN, "--model", v_path, "--output_file", temp_wav]
+            subprocess.run(cmd, input=text_to_speak, text=True, env=env, check=False)
+            subprocess.run(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", temp_wav], check=False)
+            return {"status": "ok"}
 
-    lang_codes = {"swedish": "sv-SE", "german": "de-DE", "finnish": "fi-FI", "spanish": "es-US", "dutch": "nl-NL"}
-    raise HTTPException(status_code=404, detail="No high-quality backend voice available, fallback to browser.")
+    raise HTTPException(status_code=404, detail="No voice available")
 
 if __name__ == "__main__":
     import uvicorn
