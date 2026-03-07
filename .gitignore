@@ -1,0 +1,34 @@
+# .gitignore for Polyglossia
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/*.py[cod]
+backend/*.log
+
+# Data
+*.md
+!README.md
+!german_vocab.md
+!spanish_vocab.md
+!finnish_vocab.md
+!dutch_vocab.md
+!swedish_vocab.md
+!portuguese_vocab.md
+
+# Credentials (IMPORTANT)
+google-credentials.json
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Electron logs
+electron.log
