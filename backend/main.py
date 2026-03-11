@@ -47,7 +47,29 @@ class CardModel(Base):
 
 app = FastAPI()
 app.add_middleware(GZIPMiddleware, minimum_size=1000)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "http://localhost:8001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
+]
+
+if os.getenv("ENVIRONMENT") == "production":
+    allowed = os.getenv("CORS_ORIGINS", "").split(",")
+    ALLOWED_ORIGINS = [origin.strip() for origin in allowed if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type"],
+)
 
 @app.on_event("startup")
 async def startup():
@@ -55,9 +77,21 @@ async def startup():
         await conn.run_sync(Base.metadata.create_all)
 
 # Configuration
-API_KEY_FILE = "/home/chris/wordhord/wordhord_api.txt"
-with open(API_KEY_FILE, "r") as f:
-    GOOGLE_API_KEY = f.read().strip()
+def load_google_api_key() -> str:
+    key = os.getenv("GOOGLE_API_KEY")
+    if key:
+        return key
+    try:
+        api_key_file = os.getenv("API_KEY_FILE", "/home/chris/wordhord/wordhord_api.txt")
+        with open(api_key_file, "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        raise RuntimeError(
+            "GOOGLE_API_KEY environment variable not set and API key file not found. "
+            "Set GOOGLE_API_KEY environment variable or create the API key file."
+        )
+
+GOOGLE_API_KEY = load_google_api_key()
 
 # Gemini 2.5 Flash (Latest Stable)
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=GOOGLE_API_KEY, temperature=0.1)
@@ -227,6 +261,9 @@ async def speak(request: SpeakRequest):
     if not text: return {"status": "ok"}
 
     speed = request.speed
+    if not isinstance(speed, (int, float)) or speed <= 0 or speed > 2.0:
+        speed = 1.0
+    
     text_hash = hashlib.md5(f"{text}_{request.language}".encode()).hexdigest()
     cache_path = os.path.join(CACHE_DIR, f"{text_hash}.wav")
 
@@ -266,7 +303,14 @@ async def speak(request: SpeakRequest):
                     await proc.communicate(input=text.encode())
 
     if os.path.exists(cache_path):
-        subprocess.Popen(["ffplay", "-nodisp", "-autoexit", "-af", f"atempo={speed}", "-loglevel", "quiet", cache_path])
+        try:
+            subprocess.Popen(
+                ["ffplay", "-nodisp", "-autoexit", "-af", f"atempo={speed}", "-loglevel", "quiet", cache_path],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        except FileNotFoundError:
+            pass
         return {"status": "ok"}
 
     raise HTTPException(status_code=404, detail="No voice available")
