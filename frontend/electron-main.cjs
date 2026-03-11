@@ -2,6 +2,7 @@ const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 
 app.setName('Panglossia');
+app.name = 'Panglossia';
 
 // Enable speech recognition API before app is ready
 app.commandLine.appendSwitch('enable-speech-dispatcher');

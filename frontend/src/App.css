@@ -482,3 +482,36 @@ input::placeholder {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.9rem;
 }
+
+.speed-selector {
+  display: flex;
+  gap: 0.2rem;
+  margin-left: 2rem;
+  margin-right: 1.5rem;
+  background: var(--surface0);
+  padding: 0.2rem 0.4rem;
+  border-radius: 20px;
+  border: 1px solid var(--surface1);
+}
+
+.speed-selector button {
+  background: transparent;
+  border: none;
+  color: var(--subtext0);
+  padding: 0.2rem 0.4rem;
+  min-width: 2.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.speed-selector button:hover {
+  color: var(--text);
+}
+
+.speed-selector button.active {
+  background: var(--mauve);
+  color: var(--base);
+}

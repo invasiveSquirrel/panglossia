@@ -4,6 +4,7 @@ Panglossia is an AI-powered conversational language learning tool. It allows you
 
 ## Key Features
 - **Conversational Learning**: Chat with an AI tutor in your target language.
+- **Adjustable Playback Speed**: Slow down the AI's voice (0.5x, 0.75x, 1.0x) to hear every syllable clearly, with pitch-preserved audio.
 - **Dynamic Vocabulary Extraction**: Important words from your chat are saved directly to the shared Wordhord SQLite database.
 - **Grammar Feedback**: Real-time corrections and grammatical explanations.
 - **Multi-language Support**: Swedish, German, Finnish, Spanish, Portuguese, Dutch, and Scottish Gaelic.
