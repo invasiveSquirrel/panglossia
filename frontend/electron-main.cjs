@@ -38,7 +38,7 @@ function createWindow () {
     callback(false);
   });
 
-  mainWindow.loadURL('http://localhost:5173');
+  mainWindow.loadURL('http://127.0.0.1:5173');
 }
 
 app.whenReady().then(() => {
