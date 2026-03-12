@@ -256,7 +256,17 @@ function App() {
     <div className="app-container">
       <header>
         <div className="logo">
-          <h1>Panglossia&nbsp;&nbsp;&nbsp;<span className="syriac-aleph">ܐ</span></h1>
+          <h1>Panglossia&nbsp;&nbsp;&nbsp;
+            <span className="ancient-aleph">
+              <svg width="32" height="32" viewBox="0 0 512 512" style={{ verticalAlign: 'middle', marginBottom: '4px' }}>
+                <g transform="translate(256, 256) scale(0.9)">
+                  <path d="M 80 -180 L -100 180" fill="none" stroke="currentColor" strokeWidth="55" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M -180 20 L 150 -130" fill="none" stroke="currentColor" strokeWidth="55" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M -180 20 L 130 110" fill="none" stroke="currentColor" strokeWidth="55" strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+              </svg>
+            </span>
+          </h1>
 
         </div>
         <div className="controls">

@@ -31,13 +31,13 @@ else
     echo "⚠️ Using local TTS fallback."
 fi
 # -B avoids corrupted .pyc files
-./venv/bin/python -B main.py > backend.log 2>&1 &
+nohup ./venv/bin/python -B main.py > backend.log 2>&1 &
 BACKEND_PID=$!
 
 # 3. Start Frontend (Vite)
 echo "🖥️ Starting Frontend..."
 cd "$DIR/frontend"
-npm run dev > frontend.log 2>&1 &
+nohup npm run dev > frontend.log 2>&1 &
 FRONTEND_PID=$!
 
 # 4. Wait for services to initialize
@@ -56,7 +56,7 @@ fi
 
 # 6. Launch Electron App
 echo "✨ Launching Application window..."
-DRI_PRIME=0 npx electron . --disable-gpu --disable-software-rasterizer --no-sandbox > electron.log 2>&1 &
+nohup npx electron . --disable-gpu --disable-software-rasterizer --no-sandbox > electron.log 2>&1 &
 ELECTRON_PID=$!
 
 echo "-----------------------------------"
@@ -66,3 +66,4 @@ echo "-----------------------------------"
 # Do not use 'wait' here so the Gemini CLI doesn't hang.
 # If you run this in a terminal and want it to stay in the foreground, 
 # you can run: wait
+wait

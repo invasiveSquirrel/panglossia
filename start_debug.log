@@ -1,0 +1,47 @@
++++ dirname /home/chris/panglossia/start.sh
+++ cd /home/chris/panglossia
+++ pwd
++ DIR=/home/chris/panglossia
++ echo '🚀 Starting Polyglossia...'
+🚀 Starting Polyglossia...
++ echo '🧹 Cleaning up old processes...'
+🧹 Cleaning up old processes...
++ fuser -k 8000/tcp 5173/tcp
+ 3226571+ pkill -f electron
++ echo '🧠 Starting Backend...'
+🧠 Starting Backend...
++ cd /home/chris/panglossia/backend
++ '[' -f /home/chris/wordhord/wordhord_api.txt ']'
+++ cat /home/chris/wordhord/wordhord_api.txt
++ export GOOGLE_API_KEY=AIzaSyA6mhnwbbscpNg15Wg3knZEF2EeFKNQJ0k
++ GOOGLE_API_KEY=AIzaSyA6mhnwbbscpNg15Wg3knZEF2EeFKNQJ0k
++ echo '✅ Gemini API Key loaded into environment.'
+✅ Gemini API Key loaded into environment.
++ '[' -f /home/chris/panglossia/google-credentials.json ']'
++ grep -q YOUR_PROJECT_ID /home/chris/panglossia/google-credentials.json
++ export GOOGLE_APPLICATION_CREDENTIALS=/home/chris/panglossia/google-credentials.json
++ GOOGLE_APPLICATION_CREDENTIALS=/home/chris/panglossia/google-credentials.json
++ echo '✅ Using Google Cloud TTS.'
+✅ Using Google Cloud TTS.
++ BACKEND_PID=3227929
++ echo '🖥️ Starting Frontend...'
+🖥️ Starting Frontend...
++ cd /home/chris/panglossia/frontend
++ nohup ./venv/bin/python -B main.py
++ FRONTEND_PID=3227930
++ echo '⏳ Initializing...'
+⏳ Initializing...
++ sleep 5
++ nohup npm run dev
++ kill -0 3227929
++ kill -0 3227930
++ echo '✨ Launching Application window...'
+✨ Launching Application window...
++ ELECTRON_PID=3228094
++ echo -----------------------------------
+-----------------------------------
++ echo '✅ Polyglossia is now running!'
+✅ Polyglossia is now running!
++ echo -----------------------------------
+-----------------------------------
++ nohup npx electron . --disable-gpu --disable-software-rasterizer --no-sandbox

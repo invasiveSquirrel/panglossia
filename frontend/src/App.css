@@ -144,10 +144,8 @@ header {
   align-items: center;
 }
 
-.syriac-aleph {
+.ancient-aleph {
   color: var(--yellow);
-  font-family: 'Noto Sans Syriac', serif;
-  font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -7,8 +7,12 @@
   </defs>
   <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="#cba6f7" stroke-width="16" />
   
-  <g fill="#f9e2af">
-    <!-- Syriac Estrangela Alaph (ܐ) as shown on Wikipedia -->
-    <path d="M 355.5,92.75 L 332,116.25 L 332,395.75 L 355.5,419.25 L 355.5,92.75 z M 156.5,92.75 L 156.5,419.25 L 180,395.75 L 180,116.25 L 156.5,92.75 z M 180,232.25 L 180,279.75 L 332,279.75 L 332,232.25 L 180,232.25 z" />
+  <g transform="translate(256, 256) scale(1.1)">
+    <!-- Paleo-Hebrew Aleph (𐤀) - The "Ancient Hebrew" Script -->
+    <!-- Main slanted backbone -->
+    <path d="M 80 -180 L -100 180" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- The horizontal bars forming the ox-head triangular shape -->
+    <path d="M -180 20 L 150 -130" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M -180 20 L 130 110" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 </svg>
