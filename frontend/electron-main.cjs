@@ -14,8 +14,9 @@ function createWindow () {
     height: 900,
     title: 'Panglossia',
     icon: path.join(__dirname, '../icon.png'),
-    backgroundColor: '#1e1e2e', // Catppuccin Base
-    autoHideMenuBar: true, // Hides the Alt-menu by default
+    transparent: true,
+    frame: true,
+    autoHideMenuBar: true, 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
