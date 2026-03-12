@@ -283,16 +283,56 @@ main:hover::-webkit-scrollbar-thumb {
   gap: 0.5rem;
 }
 
+.foreign-section {
+  color: var(--lavender);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  font-size: 1.4rem;
+}
+
+.english-section {
+  color: var(--subtext1);
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--surface2);
+}
+
+.extra-section {
+  margin-top: 1rem;
+  background: var(--surface0);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
 .vocab-header {
   color: var(--mauve);
-  margin-top: 1.5rem;
+  margin-top: 0;
   margin-bottom: 0.8rem;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   border-bottom: 1px solid var(--surface2);
   padding-bottom: 0.4rem;
   width: 100%;
+  font-weight: 800;
+}
+
+.vocab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.vocab-line {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.vocab-line strong {
+  color: var(--peach);
 }
 
 .chat-line {

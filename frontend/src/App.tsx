@@ -10,12 +10,48 @@ interface Message {
 }
 
 const MessageItem = memo(({ msg, onSpeak }: { msg: Message, onSpeak: (text: string) => void }) => {
+  const formatContent = (content: string) => {
+    if (msg.role === 'user') return <div className="line-text">{content}</div>;
+
+    const sections = content.split(/(?i)(VOCABULARY|EXPRESSIONS|HELPFUL ADVICE)/);
+    const mainContent = sections[0];
+    const extraSections = [];
+    
+    for (let i = 1; i < sections.length; i += 2) {
+      extraSections.push({
+        title: sections[i],
+        content: sections[i+1]
+      });
+    }
+
+    const mainParts = mainContent.split(/\[English\]/i);
+    const foreignPart = mainParts[0].trim();
+    const englishPart = mainParts[1] ? mainParts[1].trim() : '';
+
+    return (
+      <>
+        <div className="foreign-section">{foreignPart}</div>
+        {englishPart && <div className="english-section">{englishPart}</div>}
+        {extraSections.map((sec, idx) => (
+          <div key={idx} className="extra-section">
+            <div className="vocab-header">{sec.title}</div>
+            <div className="vocab-content">
+              {sec.content.split('\n').filter(line => line.trim()).map((line, lidx) => (
+                <div key={lidx} className="vocab-line">{line}</div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </>
+    );
+  };
+
   return (
     <div className={`message ${msg.role}`}>
       <div className="message-content">
-        {msg.content}
+        {formatContent(msg.content)}
         {msg.role === 'assistant' && (
-          <button className="btn icon-btn mini-btn speak-btn" onClick={() => onSpeak(msg.content)}>
+          <button className="btn icon-btn mini-btn speak-btn-small" onClick={() => onSpeak(msg.content)}>
             <Volume2 size={16} />
           </button>
         )}
@@ -124,7 +160,13 @@ function App() {
 
   const speak = useCallback(async (text: string) => {
     if (!text) return;
-    const cleanText = text.split('[English]')[0].split('VOCABULARY')[0].replace(/[^\p{L}\p{N}\s\.,\?!]/gu, " ").trim();
+    const cleanText = text
+      .split(/\[English\]/i)[0]
+      .split(/VOCABULARY/i)[0]
+      .split(/EXPRESSIONS/i)[0]
+      .split(/HELPFUL ADVICE/i)[0]
+      .replace(/[^\p{L}\p{N}\s\.,\?!]/gu, " ")
+      .trim();
     if (!cleanText) return;
 
     try {
@@ -267,8 +309,8 @@ function App() {
       </main>
 
       <footer>
-        <div className="input-container">
-          <button className={`btn icon-btn ${isRecording ? 'recording' : ''}`} onClick={() => isRecording ? mediaRecorderRef.current?.stop() : startRecording()}>
+        <div className="input-area">
+          <button className={`icon-btn ${isRecording ? 'recording' : ''}`} onClick={() => isRecording ? mediaRecorderRef.current?.stop() : startRecording()}>
             {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
           </button>
           <input 
@@ -278,7 +320,7 @@ function App() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
           />
-          <button className="btn primary icon-btn" onClick={sendMessage} disabled={isLoading || !input.trim()}>
+          <button className="icon-btn send" onClick={sendMessage} disabled={isLoading || !input.trim()}>
             <Send size={20} />
           </button>
         </div>

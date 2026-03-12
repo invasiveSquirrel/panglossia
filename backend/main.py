@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZIPMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 from langchain_ollama import OllamaLLM
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -46,7 +46,7 @@ class CardModel(Base):
     )
 
 app = FastAPI()
-app.add_middleware(GZIPMiddleware, minimum_size=1000)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -155,16 +155,33 @@ async def parse_and_save_vocab(language, response_text):
             existing = result.scalars().first()
             
             if existing:
-                existing.translation = translation
-                existing.ipa = extract_field(section, 'IPA')
-                existing.gender = extract_field(section, 'Gender')
-                existing.plural = extract_field(section, 'Plural')
-                existing.part_of_speech = extract_field(section, 'Part of Speech')
-                existing.tone = extract_field(section, 'Tone')
-                existing.prefix = extract_field(section, 'Prefix')
-                existing.preposition = extract_field(section, 'Preposition')
-                existing.case = extract_field(section, 'Case')
-                existing.conjugations = extract_field(section, 'Conjugations')
+                # Merge translations if different
+                if translation and translation.lower() not in existing.translation.lower():
+                    existing.translation = f"{existing.translation}, {translation}"
+                
+                # Merge example if different
+                ex_match = re.search(r'Example:\s*"([^"]+)"\s*\(([^)]+)\)', section)
+                if ex_match:
+                    new_ex = ex_match.group(1)
+                    new_ex_trans = ex_match.group(2)
+                    if new_ex and new_ex.lower() not in (existing.example or "").lower():
+                        if existing.example:
+                            existing.example = f"{existing.example}\n{new_ex}"
+                            existing.example_translation = f"{existing.example_translation}\n{new_ex_trans}"
+                        else:
+                            existing.example = new_ex
+                            existing.example_translation = new_ex_trans
+
+                # Update other fields only if they were empty
+                if not existing.ipa: existing.ipa = extract_field(section, 'IPA')
+                if not existing.gender: existing.gender = extract_field(section, 'Gender')
+                if not existing.plural: existing.plural = extract_field(section, 'Plural')
+                if not existing.part_of_speech: existing.part_of_speech = extract_field(section, 'Part of Speech')
+                if not existing.tone: existing.tone = extract_field(section, 'Tone')
+                if not existing.prefix: existing.prefix = extract_field(section, 'Prefix')
+                if not existing.preposition: existing.preposition = extract_field(section, 'Preposition')
+                if not existing.case: existing.case = extract_field(section, 'Case')
+                if not existing.conjugations: existing.conjugations = extract_field(section, 'Conjugations')
                 card = existing
             else:
                 card = CardModel(

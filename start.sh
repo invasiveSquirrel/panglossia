@@ -16,6 +16,13 @@ pkill -f "electron" 2>/dev/null
 # 2. Start Backend (FastAPI)
 echo "🧠 Starting Backend..."
 cd "$DIR/backend"
+
+# Load Gemini API Key into environment
+if [ -f "/home/chris/wordhord/wordhord_api.txt" ]; then
+    export GOOGLE_API_KEY=$(cat /home/chris/wordhord/wordhord_api.txt)
+    echo "✅ Gemini API Key loaded into environment."
+fi
+
 # Handle Google Cloud Credentials
 if [ -f "$DIR/google-credentials.json" ] && ! grep -q "YOUR_PROJECT_ID" "$DIR/google-credentials.json"; then
     export GOOGLE_APPLICATION_CREDENTIALS="$DIR/google-credentials.json"
@@ -49,7 +56,7 @@ fi
 
 # 6. Launch Electron App
 echo "✨ Launching Application window..."
-npx electron . --disable-gpu --disable-software-rasterizer --no-sandbox > electron.log 2>&1 &
+DRI_PRIME=0 npx electron . --disable-gpu --disable-software-rasterizer --no-sandbox > electron.log 2>&1 &
 ELECTRON_PID=$!
 
 echo "-----------------------------------"
