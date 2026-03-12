@@ -7,12 +7,8 @@
   </defs>
   <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="#cba6f7" stroke-width="16" />
   
-  <g transform="translate(256, 256) scale(1.1)">
-    <!-- Paleo-Hebrew Aleph (𐤀) - The "Ancient Hebrew" Script -->
-    <!-- Main slanted backbone -->
-    <path d="M 80 -180 L -100 180" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" />
-    <!-- The horizontal bars forming the ox-head triangular shape -->
-    <path d="M -180 20 L 150 -130" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" />
-    <path d="M -180 20 L 130 110" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" />
+  <g transform="translate(256, 256) scale(6.5) translate(-50, -50)" fill="#f9e2af">
+    <!-- Hebrew Aleph (א) - Biblical Square Script -->
+    <path d="M25,20 L35,20 Q40,20 45,30 L75,80 L65,80 Q60,80 55,70 L25,20 Z M65,20 L75,20 L75,45 Q75,50 70,50 L55,50 L65,20 Z M25,50 L45,50 Q50,50 50,55 L50,80 L25,80 L25,50 Z" />
   </g>
 </svg>

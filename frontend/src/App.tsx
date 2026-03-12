@@ -258,12 +258,11 @@ function App() {
         <div className="logo">
           <h1>Panglossia&nbsp;&nbsp;&nbsp;
             <span className="ancient-aleph">
-              <svg width="32" height="32" viewBox="0 0 512 512" style={{ verticalAlign: 'middle', marginBottom: '4px' }}>
-                <g transform="translate(256, 256) scale(0.9)">
-                  <path d="M 80 -180 L -100 180" fill="none" stroke="currentColor" strokeWidth="55" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M -180 20 L 150 -130" fill="none" stroke="currentColor" strokeWidth="55" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M -180 20 L 130 110" fill="none" stroke="currentColor" strokeWidth="55" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
+              <svg width="32" height="32" viewBox="0 0 100 100" style={{ verticalAlign: 'middle', marginBottom: '4px' }}>
+                <path 
+                  d="M25,20 L35,20 Q40,20 45,30 L75,80 L65,80 Q60,80 55,70 L25,20 Z M65,20 L75,20 L75,45 Q75,50 70,50 L55,50 L65,20 Z M25,50 L45,50 Q50,50 50,55 L50,80 L25,80 L25,50 Z" 
+                  fill="currentColor" 
+                />
               </svg>
             </span>
           </h1>
