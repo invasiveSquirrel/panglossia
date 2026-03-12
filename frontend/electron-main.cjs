@@ -14,7 +14,7 @@ function createWindow () {
     height: 900,
     title: 'Panglossia',
     icon: path.join(__dirname, '../icon.png'),
-    transparent: true,
+    backgroundColor: '#1e1e2e',
     frame: true,
     autoHideMenuBar: true, 
     webPreferences: {
