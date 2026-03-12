@@ -7,11 +7,8 @@
   </defs>
   <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="#cba6f7" stroke-width="16" />
   
-  <g transform="translate(256, 256) scale(1.2)">
-    <!-- Syriac Aleph (ܐ) Construction -->
-    <!-- Vertical bar -->
-    <path d="M -40 -100 L -40 100" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="butt" />
-    <!-- Top horizontal stroke -->
-    <path d="M -40 -100 L 60 -100" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="butt" />
+  <g fill="#f9e2af">
+    <!-- Syriac Estrangela Alaph (ܐ) as shown on Wikipedia -->
+    <path d="M 355.5,92.75 L 332,116.25 L 332,395.75 L 355.5,419.25 L 355.5,92.75 z M 156.5,92.75 L 156.5,419.25 L 180,395.75 L 180,116.25 L 156.5,92.75 z M 180,232.25 L 180,279.75 L 332,279.75 L 332,232.25 L 180,232.25 z" />
   </g>
 </svg>
