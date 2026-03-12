@@ -1,15 +1,17 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="240" fill="#ffffff" stroke="#000000" stroke-width="4" />
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#11111b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="#cba6f7" stroke-width="16" />
   
-  <g transform="translate(256, 256) scale(1.1)">
-    <!-- LaTeX style Aleph (\aleph) construction -->
-    <!-- Main diagonal -->
-    <path d="M 80 -120 L -80 120" fill="none" stroke="#000000" stroke-width="35" stroke-linecap="round" />
-    
-    <!-- Top-left hook -->
-    <path d="M -90 -120 C -40 -120 0 -60 0 0" fill="none" stroke="#000000" stroke-width="30" stroke-linecap="round" />
-    
-    <!-- Bottom-right hook -->
-    <path d="M 90 120 C 40 120 0 60 0 0" fill="none" stroke="#000000" stroke-width="30" stroke-linecap="round" />
+  <g transform="translate(256, 256) scale(1.2)">
+    <!-- Syriac Aleph (ܐ) Construction -->
+    <!-- Vertical bar -->
+    <path d="M -40 -100 L -40 100" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="butt" />
+    <!-- Top horizontal stroke -->
+    <path d="M -40 -100 L 60 -100" fill="none" stroke="#f9e2af" stroke-width="45" stroke-linecap="butt" />
   </g>
 </svg>
