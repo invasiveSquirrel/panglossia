@@ -26,7 +26,8 @@ def generate_samples():
             
             try:
                 response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
-                filename = f"/home/chris/polyglossia/test_voices/{voice_name}.wav"
+                filename = f"/home/chris/panglossia/test_voices/{voice_name}.wav"
+                os.makedirs("/home/chris/panglossia/test_voices", exist_ok=True)
                 with open(filename, "wb") as out:
                     out.write(response.audio_content)
             except Exception as e:

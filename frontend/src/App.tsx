@@ -256,12 +256,8 @@ function App() {
     <div className="app-container">
       <header>
         <div className="logo">
-          <h1>
-            Panglossia&nbsp;&nbsp;&nbsp;
-            <span style={{ color: '#eed49f', fontFamily: '"Noto Serif Hebrew", serif', fontWeight: 900 }}>
-              א
-            </span>
-          </h1>
+          <h1>Panglossia&nbsp;&nbsp;&nbsp;<span className="syriac-aleph">ܐ</span></h1>
+
         </div>
         <div className="controls">
           <div className="speed-selector">

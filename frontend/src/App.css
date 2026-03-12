@@ -140,6 +140,18 @@ header {
 .logo h1 {
   font-size: 1.8rem;
   color: var(--mauve);
+  display: flex;
+  align-items: center;
+}
+
+.syriac-aleph {
+  color: var(--yellow);
+  font-family: 'Noto Sans Syriac', serif;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .icon-sparkle {

@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/chris/polyglossia/frontend
+cd /home/chris/panglossia/frontend
 npm run dev

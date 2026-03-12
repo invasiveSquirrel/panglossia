@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/chris/polyglossia/backend
+cd /home/chris/panglossia/backend
 ./venv/bin/python -B main.py
