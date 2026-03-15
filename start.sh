@@ -18,9 +18,12 @@ echo "🧠 Starting Backend..."
 cd "$DIR/backend"
 
 # Load Gemini API Key into environment
-if [ -f "/home/chris/wordhord/wordhord_api.txt" ]; then
-    export GOOGLE_API_KEY=$(cat /home/chris/wordhord/wordhord_api.txt)
-    echo "✅ Gemini API Key loaded into environment."
+API_KEY_FILE="$HOME/wordhord/wordhord_api.txt"
+if [ -f "$API_KEY_FILE" ]; then
+    export GOOGLE_API_KEY=$(cat "$API_KEY_FILE")
+    echo "✅ Gemini API Key loaded from $API_KEY_FILE."
+elif [ -n "$GOOGLE_API_KEY" ]; then
+    echo "✅ Using GOOGLE_API_KEY from environment."
 fi
 
 # Handle Google Cloud Credentials

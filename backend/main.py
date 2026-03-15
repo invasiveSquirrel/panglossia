@@ -16,7 +16,8 @@ import hashlib
 import aiofiles
 
 # Database Setup
-DB_PATH = "/home/chris/wordhord/wordhord.db"
+DB_PATH = os.getenv("WORDHORD_DB_PATH", os.path.expanduser("~/wordhord/wordhord.db"))
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 engine = create_async_engine(f"sqlite+aiosqlite:///{DB_PATH}")
 AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 Base = declarative_base()
@@ -82,7 +83,7 @@ def load_google_api_key() -> str:
     if key:
         return key
     try:
-        api_key_file = os.getenv("API_KEY_FILE", "/home/chris/wordhord/wordhord_api.txt")
+        api_key_file = os.getenv("API_KEY_FILE", os.path.expanduser("~/wordhord/wordhord_api.txt"))
         with open(api_key_file, "r") as f:
             return f.read().strip()
     except FileNotFoundError:
@@ -304,7 +305,9 @@ async def speak(request: SpeakRequest):
                 )
                 async with aiofiles.open(cache_path, "wb") as out:
                     await out.write(resp.audio_content)
-            except Exception: pass
+            except Exception as e:
+                # Log the error but don't block the fallback
+                print(f"Google Cloud TTS failed: {e}")
 
         if not os.path.exists(cache_path):
             voice_map = {"swedish": "sv_female.onnx", "finnish": "fi_female.onnx", "spanish": "es_mx_ximena.onnx"}

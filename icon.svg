@@ -7,8 +7,8 @@
   </defs>
   <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="#cba6f7" stroke-width="16" />
   
-  <g transform="translate(256, 256) scale(6.5) translate(-50, -50)" fill="#f9e2af">
-    <!-- Hebrew Aleph (א) - Biblical Square Script -->
-    <path d="M25,20 L35,20 Q40,20 45,30 L75,80 L65,80 Q60,80 55,70 L25,20 Z M65,20 L75,20 L75,45 Q75,50 70,50 L55,50 L65,20 Z M25,50 L45,50 Q50,50 50,55 L50,80 L25,80 L25,50 Z" />
+  <g transform="translate(256, 256) scale(5.0) translate(-50, -50)" fill="#f9e2af">
+    <!-- Hebrew Aleph (א) - Thinner, more delicate version -->
+    <path d="M32,25 L38,25 Q41,25 43,30 L70,75 L64,75 Q61,75 59,70 L32,25 Z M65,25 L72,25 L72,45 Q72,48 69,48 L58,48 L65,25 Z M28,52 L43,52 Q46,52 46,55 L46,75 L34,75 Q28,75 28,69 L28,52 Z" />
   </g>
 </svg>
